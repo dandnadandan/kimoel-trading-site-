@@ -5,11 +5,11 @@ import fs from 'fs';
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Simple test route
+// Serve the original beautiful admin panel
 app.get('/', (req, res) => {
   console.log('Request received for /');
   try {
-    const filePath = path.join(process.cwd(), 'simple.html');
+    const filePath = path.join(process.cwd(), 'admin-panel.html');
     console.log('File path:', filePath);
     console.log('File exists:', fs.existsSync(filePath));
     res.sendFile(filePath);
@@ -19,11 +19,11 @@ app.get('/', (req, res) => {
   }
 });
 
-// Admin basic route
+// Admin route
 app.get('/admin', (req, res) => {
   console.log('Request received for /admin');
   try {
-    const filePath = path.join(process.cwd(), 'admin-basic.html');
+    const filePath = path.join(process.cwd(), 'admin-panel.html');
     console.log('Admin file path:', filePath);
     console.log('Admin file exists:', fs.existsSync(filePath));
     res.sendFile(filePath);
@@ -42,7 +42,7 @@ app.get('/test', (req, res) => {
 // Handle all other routes
 app.use((req, res) => {
   console.log('Fallback route:', req.path);
-  res.send('Route not found: ' + req.path);
+  res.sendFile(path.join(process.cwd(), 'admin-panel.html'));
 });
 
 app.listen(PORT, () => {
