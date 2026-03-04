@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
 interface ServiceCardProps {
   title: string;
@@ -7,6 +8,7 @@ interface ServiceCardProps {
   image: string;
   imageAlt: string;
   buttonText?: string;
+  onToggle?: () => void;
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({
@@ -14,7 +16,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   description,
   image,
   imageAlt,
-  buttonText,
+  buttonText = "View Details",
+  onToggle,
 }) => {
   // Reuse the same animation pattern as Products.tsx
   const itemVariants = {
@@ -41,22 +44,28 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-4 sm:p-6 flex flex-col justify-between">
-        <div>
-          <h3 className="text-lg sm:text-xl font-semibold text-brand-blue-dark mb-2 sm:mb-3 transition-colors duration-300 group-hover:text-[#FFD700]">
-            {title}
-          </h3>
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3 sm:mb-4">
-            {description}
-          </p>
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col h-full">
+          <div className="flex-1">
+            <h3 className="text-lg sm:text-xl font-semibold text-brand-blue-dark mb-2 sm:mb-3 transition-colors duration-300 group-hover:text-[#FFD700]">
+              {title}
+            </h3>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              {description}
+            </p>
+          </div>
+          
+          {/* View Details Button - Lower Right */}
+          <div className="flex justify-end mt-4">
+            <Button
+              onClick={onToggle}
+              variant="default"
+              className="shrink-0"
+            >
+              {buttonText}
+            </Button>
+          </div>
         </div>
-
-        {/* Button */}
-        {buttonText && (
-          <button className="mt-auto px-4 py-2 text-sm sm:text-base bg-brand-gold text-white font-medium rounded-lg hover:bg-brand-gold-dark transition-colors duration-300">
-            {buttonText}
-          </button>
-        )}
       </div>
     </motion.div>
   );
