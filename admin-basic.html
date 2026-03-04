@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kimoel Admin - Basic</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .login { text-align: center; padding: 40px; }
+        input { padding: 10px; margin: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .dashboard { display: none; }
+        .invoice { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .status.pending { background: #fef3c7; color: #78350f; }
+        .status.in-progress { background: #dbeafe; color: #1e3a8a; }
+        .status.completed { background: #d1fae5; color: #14532d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login">
+            <h1>🏢 Kimoel Trading Admin</h1>
+            <p>Invoice Management System</p>
+            <div>
+                <input type="text" id="username" placeholder="Username">
+                <input type="password" id="password" placeholder="Password">
+                <button onclick="login()">Login</button>
+            </div>
+        </div>
+        
+        <div class="dashboard" id="dashboard">
+            <h2>📊 Invoice Dashboard</h2>
+            <button onclick="logout()">Logout</button>
+            <div id="invoices">
+                <p>Loading invoices...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'kimoel123') {
+                document.querySelector('.login').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadInvoices();
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+        
+        function logout() {
+            document.querySelector('.login').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+        
+        function loadInvoices() {
+            try {
+                const invoices = JSON.parse(localStorage.getItem('kimoel_invoices') || '[]');
+                const invoiceDiv = document.getElementById('invoices');
+                
+                if (invoices.length === 0) {
+                    invoiceDiv.innerHTML = '<p>No invoices found</p>';
+                    return;
+                }
+                
+                invoiceDiv.innerHTML = invoices.map(inv => `
+                    <div class="invoice">
+                        <strong>${inv.customerName || 'Unknown'}</strong><br>
+                        <small>${inv.email || 'No email'}</small><br>
+                        <small>${inv.itemTitle || 'No item'}</small><br>
+                        <span class="status ${inv.status || 'pending'}">${inv.status || 'pending'}</span>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('invoices').innerHTML = '<p>Error loading invoices</p>';
+            }
+        }
+    </script>
+</body>
+</html>

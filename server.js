@@ -4,14 +4,22 @@ import path from 'path';
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Serve the simple admin panel
+// Serve the basic admin panel for debugging
 app.get('/', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'admin-simple.html'));
+  console.log('Serving admin-basic.html');
+  res.sendFile(path.join(process.cwd(), 'admin-basic.html'));
 });
 
-// Handle all other routes by serving the simple admin panel
+// Test route
+app.get('/test', (req, res) => {
+  console.log('Serving test.html');
+  res.sendFile(path.join(process.cwd(), 'test.html'));
+});
+
+// Handle all other routes by serving the basic admin panel
 app.use((req, res) => {
-  res.sendFile(path.join(process.cwd(), 'admin-simple.html'));
+  console.log('Fallback: serving admin-basic.html');
+  res.sendFile(path.join(process.cwd(), 'admin-basic.html'));
 });
 
 app.listen(PORT, () => {
