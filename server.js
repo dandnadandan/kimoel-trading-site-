@@ -1,6 +1,6 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
+import express from 'express';
+import path from 'path';
+import fs from 'fs';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -20,12 +20,12 @@ app.use(express.static('.', {
 
 // Serve the admin panel as the main page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin-panel.html'));
+  res.sendFile(path.join(process.cwd(), 'admin-panel.html'));
 });
 
 // Handle all other routes by serving admin-panel.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin-panel.html'));
+  res.sendFile(path.join(process.cwd(), 'admin-panel.html'));
 });
 
 app.listen(PORT, () => {
