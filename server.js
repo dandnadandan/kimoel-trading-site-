@@ -23,8 +23,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'admin-panel.html'));
 });
 
-// Handle all other routes by serving admin-panel.html
-app.get('*', (req, res) => {
+// Handle SPA routing - catch all other routes
+app.use((req, res) => {
   res.sendFile(path.join(process.cwd(), 'admin-panel.html'));
 });
 
