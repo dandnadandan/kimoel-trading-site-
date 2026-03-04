@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kimoel Trading - Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .dashboard {
+            display: none;
+        }
+        .invoice-list {
+            margin-top: 20px;
+        }
+        .invoice-item {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.pending { background: #fef3c7; color: #78350f; }
+        .status.in-progress { background: #dbeafe; color: #1e3a8a; }
+        .status.completed { background: #d1fae5; color: #14532d; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Kimoel Trading Admin Panel</h1>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="login-form">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <button onclick="login()">Login</button>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>📊 Invoice Dashboard</h2>
+                <button onclick="logout()" style="width: auto; background: #ef4444;">Logout</button>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <select id="statusFilter" onchange="filterInvoices()" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Search invoices..." onkeyup="filterInvoices()" style="padding: 8px; margin-left: 10px; border-radius: 4px; border: 1px solid #ddd;">
+            </div>
+
+            <div id="invoiceList" class="invoice-list">
+                <p>Loading invoices...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let invoices = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === 'admin' && password === 'kimoel123') {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadInvoices();
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function loadInvoices() {
+            // Get invoices from localStorage (shared with main site)
+            const storedInvoices = localStorage.getItem('kimoel_invoices');
+            if (storedInvoices) {
+                invoices = JSON.parse(storedInvoices);
+            } else {
+                invoices = [];
+            }
+            displayInvoices();
+        }
+
+        function displayInvoices() {
+            const invoiceList = document.getElementById('invoiceList');
+            
+            let filteredInvoices = invoices.filter(invoice => {
+                const matchesStatus = currentFilter === 'all' || invoice.status === currentFilter;
+                const matchesSearch = searchQuery === '' || 
+                    invoice.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    invoice.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    invoice.itemTitle.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesStatus && matchesSearch;
+            });
+
+            if (filteredInvoices.length === 0) {
+                invoiceList.innerHTML = '<p>No invoices found</p>';
+                return;
+            }
+
+            invoiceList.innerHTML = filteredInvoices.map(invoice => `
+                <div class="invoice-item">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <strong>${invoice.customerName}</strong><br>
+                            <small>${invoice.email}</small><br>
+                            <small>${invoice.itemTitle}</small><br>
+                            <small>${new Date(invoice.createdAt).toLocaleDateString()}</small>
+                        </div>
+                        <div>
+                            <span class="status ${invoice.status}">${invoice.status}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button onclick="updateStatus('${invoice.id}', 'pending')" style="width: auto; margin-right: 5px; padding: 5px 10px; font-size: 12px;">Pending</button>
+                        <button onclick="updateStatus('${invoice.id}', 'in-progress')" style="width: auto; margin-right: 5px; padding: 5px 10px; font-size: 12px;">In Progress</button>
+                        <button onclick="updateStatus('${invoice.id}', 'completed')" style="width: auto; margin-right: 5px; padding: 5px 10px; font-size: 12px;">Completed</button>
+                        <button onclick="deleteInvoice('${invoice.id}')" style="width: auto; background: #ef4444; padding: 5px 10px; font-size: 12px;">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStatus(invoiceId, newStatus) {
+            const invoiceIndex = invoices.findIndex(inv => inv.id === invoiceId);
+            if (invoiceIndex !== -1) {
+                invoices[invoiceIndex].status = newStatus;
+                localStorage.setItem('kimoel_invoices', JSON.stringify(invoices));
+                displayInvoices();
+            }
+        }
+
+        function deleteInvoice(invoiceId) {
+            if (confirm('Are you sure you want to delete this invoice?')) {
+                invoices = invoices.filter(inv => inv.id !== invoiceId);
+                localStorage.setItem('kimoel_invoices', JSON.stringify(invoices));
+                displayInvoices();
+            }
+        }
+
+        function filterInvoices() {
+            currentFilter = document.getElementById('statusFilter').value;
+            searchQuery = document.getElementById('searchInput').value;
+            displayInvoices();
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadInvoices, 30000);
+    </script>
+</body>
+</html>
