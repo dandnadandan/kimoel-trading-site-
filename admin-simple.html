@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kimoel Trading - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background: #f9fafb;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        button {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+        .dashboard {
+            display: none;
+            padding: 30px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .dashboard h2 {
+            color: #1f2937;
+            font-size: 2rem;
+        }
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: auto;
+        }
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .controls select, .controls input {
+            padding: 10px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .invoice-list {
+            display: grid;
+            gap: 15px;
+        }
+        .invoice-item {
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        .invoice-item:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .invoice-info h3 {
+            color: #1f2937;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        .invoice-info small {
+            color: #6b7280;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status.pending { 
+            background: #fef3c7; 
+            color: #78350f; 
+            border: 1px solid #f59e0b;
+        }
+        .status.in-progress { 
+            background: #dbeafe; 
+            color: #1e3a8a; 
+            border: 1px solid #3b82f6;
+        }
+        .status.completed { 
+            background: #d1fae5; 
+            color: #14532d; 
+            border: 1px solid #10b981;
+        }
+        .invoice-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .invoice-actions button {
+            padding: 8px 12px;
+            font-size: 12px;
+            width: auto;
+            border-radius: 6px;
+        }
+        .btn-pending { background: #f59e0b; }
+        .btn-progress { background: #3b82f6; }
+        .btn-completed { background: #10b981; }
+        .btn-delete { background: #ef4444; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Kimoel Trading Admin Panel</h1>
+            <p>Invoice Management System</p>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="login-form">
+            <h2 style="text-align: center; margin-bottom: 25px; color: #1f2937;">Admin Login</h2>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+            </div>
+            <button onclick="login()">Login</button>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <div class="dashboard-header">
+                <h2>📊 Invoice Dashboard</h2>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            
+            <div class="controls">
+                <select id="statusFilter" onchange="filterInvoices()">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Search invoices..." onkeyup="filterInvoices()">
+            </div>
+
+            <div id="invoiceList" class="invoice-list">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h3>No invoices found</h3>
+                    <p>Start by submitting invoices from the main website</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let invoices = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === 'admin' && password === 'kimoel123') {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadInvoices();
+            } else {
+                showMessage('Invalid credentials!', 'error');
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function loadInvoices() {
+            try {
+                const storedInvoices = localStorage.getItem('kimoel_invoices');
+                if (storedInvoices) {
+                    invoices = JSON.parse(storedInvoices);
+                } else {
+                    invoices = [];
+                }
+                displayInvoices();
+            } catch (error) {
+                console.error('Error loading invoices:', error);
+                invoices = [];
+                displayInvoices();
+            }
+        }
+
+        function displayInvoices() {
+            const invoiceList = document.getElementById('invoiceList');
+            
+            let filteredInvoices = invoices.filter(invoice => {
+                const matchesStatus = currentFilter === 'all' || invoice.status === currentFilter;
+                const matchesSearch = searchQuery === '' || 
+                    invoice.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    invoice.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    invoice.itemTitle?.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesStatus && matchesSearch;
+            });
+
+            if (filteredInvoices.length === 0) {
+                invoiceList.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h3>No invoices found</h3>
+                        <p>${searchQuery ? 'Try adjusting your search' : 'Start by submitting invoices from the main website'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            invoiceList.innerHTML = filteredInvoices.map(invoice => `
+                <div class="invoice-item">
+                    <div class="invoice-header">
+                        <div class="invoice-info">
+                            <h3>${invoice.customerName || 'Unknown Customer'}</h3>
+                            <small>📧 ${invoice.email || 'No email'}</small>
+                            <small>📱 ${invoice.phone || 'No phone'}</small>
+                            <small>📍 ${invoice.location || 'No location'}</small>
+                            <small>📦 ${invoice.itemTitle || 'No item'}</small>
+                            <small>📅 ${invoice.createdAt ? new Date(invoice.createdAt).toLocaleDateString() : 'No date'}</small>
+                            <small>🔖 ${invoice.referenceNumber || 'No reference'}</small>
+                        </div>
+                        <div>
+                            <span class="status ${invoice.status || 'pending'}">${invoice.status || 'pending'}</span>
+                        </div>
+                    </div>
+                    <div class="invoice-actions">
+                        <button class="btn-pending" onclick="updateStatus('${invoice.id}', 'pending')">Pending</button>
+                        <button class="btn-progress" onclick="updateStatus('${invoice.id}', 'in-progress')">In Progress</button>
+                        <button class="btn-completed" onclick="updateStatus('${invoice.id}', 'completed')">Completed</button>
+                        <button class="btn-delete" onclick="deleteInvoice('${invoice.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStatus(invoiceId, newStatus) {
+            const invoiceIndex = invoices.findIndex(inv => inv.id === invoiceId);
+            if (invoiceIndex !== -1) {
+                invoices[invoiceIndex].status = newStatus;
+                localStorage.setItem('kimoel_invoices', JSON.stringify(invoices));
+                displayInvoices();
+                showMessage(`Invoice status updated to ${newStatus}`, 'success');
+            }
+        }
+
+        function deleteInvoice(invoiceId) {
+            if (confirm('Are you sure you want to delete this invoice?')) {
+                invoices = invoices.filter(inv => inv.id !== invoiceId);
+                localStorage.setItem('kimoel_invoices', JSON.stringify(invoices));
+                displayInvoices();
+                showMessage('Invoice deleted successfully', 'success');
+            }
+        }
+
+        function filterInvoices() {
+            currentFilter = document.getElementById('statusFilter').value;
+            searchQuery = document.getElementById('searchInput').value;
+            displayInvoices();
+        }
+
+        function showMessage(message, type) {
+            // Create a simple toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'error' ? '#ef4444' : '#10b981'};
+                color: white;
+                border-radius: 8px;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            if (!document.getElementById('dashboard').classList.contains('hidden')) {
+                loadInvoices();
+            }
+        }, 30000);
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Handle Enter key for login
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
